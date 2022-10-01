@@ -13,7 +13,7 @@ var worldURL = "textures/Moon/Stars.jpg"
 
 var scene = new THREE.Scene();
 
-var camera = new THREE.PerspectiveCamera(100, window.innerWidth / window.innerHeight, 0.1, 2000);
+var camera = new THREE.PerspectiveCamera(10, window.innerWidth / window.innerHeight, 0.1, 2000);
 
 var renderer = new THREE.WebGLRenderer({ antialias: true });
 
@@ -21,7 +21,7 @@ var controls = new OrbitControls(camera, renderer.domElement);
 controls.enablePan = false;
 
 
-renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setSize(window.innerWidth / 1, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 var moon = new THREE.SphereGeometry(2, 60, 60);
@@ -71,17 +71,20 @@ var worldMaterial = new THREE.MeshBasicMaterial(
     }
 );
 
-const tor = new THREE.TorusGeometry(10, 1, 16, 100);
+const tor = new THREE.TorusGeometry(.5, .01, 16, 100);
 const torMat = new THREE.MeshPhongMaterial({ color: 0xffff00 })
 const torus = new THREE.Mesh(tor, torMat);
+// torus.scale.set(.5,.5,.5);
+
 torus.name = "Torus"
-scene.add( torus );
+// scene.add( torus );
 
 var Pin = new THREE.Group()
 
 
 var world = new THREE.Mesh(worldGeometry, worldMaterial);
-var pointMesh = new THREE.SphereGeometry(.2, 20, 20)
+var pointMesh = new THREE.SphereGeometry(.1, 20, 20)
+
 var pointNorthMesh = new THREE.SphereGeometry(.2, 20, 20)
 var pointSouthMesh = new THREE.SphereGeometry(.2, 20, 20)
 var spherical = new THREE.Spherical(2.1, Math.PI * 90 / 180, 0)
@@ -97,12 +100,14 @@ var pointMaterial = new THREE.MeshPhongMaterial(
 
 );
 var point = new THREE.Mesh(pointMesh, pointMaterial)
+point.scale.set(1,1,.2)
 //////////////////////////////////////////
 
 
 var pointSouth = new THREE.Mesh(pointNorthMesh, pointMaterial)
 var pointNorth = new THREE.Mesh(pointSouthMesh, pointMaterial)
 point.position.setFromSpherical(spherical)
+torus.position.setFromSpherical(spherical)
 // point.name = "PIN"
 pointNorth.position.setFromSpherical(sphericalNorth)
 pointSouth.position.setFromSpherical(sphericalSouth)
@@ -122,12 +127,11 @@ scene.add(world);
 scene.add(moon);
 
 //Add to Groups
-Pin.add(point,torus)
-MoonGroup.add(point)
+Pin.add(point, torus)
+MoonGroup.add(Pin)
 MoonGroup.add(moon)
 
 //Add Groups to scene
-scene.add(Pin)
 scene.add(MoonGroup)
 
 camera.position.z = 5;
@@ -135,7 +139,9 @@ camera.position.z = 5;
 moon.rotation.x = 3.1415 * 0.02;
 moon.rotation.y = 3.1415 * 1.54;
 
-
+var ts = new THREE.Vector3(0, 0, 1)
+var radius = 2.1
+// var sphericalTor = 
 function animate() {
     requestAnimationFrame(animate);
     MoonGroup.rotation.y += 0.005;
@@ -146,6 +152,7 @@ function animate() {
     // Pin.children[1].scale.x += 0.00001;
     // Pin.children[1].scale.y += 0.00001;
     // Pin.children[1].scale.z += 0.00001;
+    console.log(Pin.children)
 
 
 
@@ -155,9 +162,25 @@ function animate() {
 
 
 
-    
-
+    ts.x += 0.01;
+    ts.y += 0.01;
+    // ts.z += 0.1;
+    Pin.scale.set(ts.x, ts.y, ts.z)
+    radius -= 0.001
+    Pin.position.setFromSpherical(new THREE.Spherical(.1, Math.PI * 90 / 180, 0))
+    if(radius <= 0){
+        // radius = 2.1
+    }
+    // var pos = Pin.position
+    // pos.z -= .01
+    // Pin.position.set(pos)
     console.log(Pin?.children)
+
+
+    if (ts.x > 1) {
+        ts.x = 0.1;
+        ts.y = 0.1;
+    }
 
     renderer.render(scene, camera);
 }
@@ -167,7 +190,7 @@ animate();
 function onResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth , window.innerHeight);
+    renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
 window.addEventListener('resize', onResize, false);
