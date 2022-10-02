@@ -55,7 +55,7 @@ const controls = new OrbitControls(camera, renderer.domElement);
 controls.dampingFactor = 0.25;
 controls.enableDamping = true;
 
-renderer.setSize(window.innerWidth / 1 / 1, window.innerHeight);
+renderer.setSize(window.innerWidth / 1.5 / 1, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 var moon = new THREE.SphereGeometry(2, 100, 100);
@@ -128,8 +128,9 @@ torus.name = "Torus"
 var Pin = new THREE.Group()
 var angle = 0;
 
-var Spherical = (angle) => {
-  return new THREE.Spherical(1., Math.PI * angle / 180, angle)
+//R,Theta,Phi
+var Spherical = (theta, phi) => {
+  return new THREE.Spherical(1., theta, phi)
 }
 
 var pointMesh = new THREE.SphereGeometry(.01, 20, 20)
@@ -153,11 +154,36 @@ point.scale.set(1, 1, .2)
 let Arr = []
 let MoonGroup = new THREE.Group()
 
-for (var i = 0; i < 8; i++) {
+function makeRangeIterator(start = 0, end = Infinity, step = 1) {
+  let nextIndex = start;
+  let iterationCount = 0;
+
+  const rangeIterator = {
+    next() {
+      let result;
+      if (nextIndex < end) {
+        result = { value: quakeInfo[nextIndex], done: false };
+        nextIndex += step;
+        iterationCount++;
+        return result;
+      }
+      return { value: quakeInfo[nextIndex], done: true };
+    }
+  };
+  return rangeIterator;
+}
+
+
+Arr = []
+const infoo = makeRangeIterator(0, quakeInfo.length, 1)
+let index = 0;
+let getInfo = () => {
+  let info = quakeInfo[index]
+  index = (index+1)%10;
   let r = Math.random() * 255;
   let g = Math.random() * 255;
   let b = Math.random() * 255;
-  // let colorr = new THREE.Color(`rgb(${}, ${.5}, ${.4})`);
+  // let colorr = new THREE.Color(`rgb(255,255,255)`);
   let colorr = new THREE.Color("rgb(" + parseInt(r) + "," + parseInt(g) + "," + parseInt(b) + ")");
   console.log(colorr)
   const torMatt = new THREE.MeshPhongMaterial({
@@ -166,10 +192,10 @@ for (var i = 0; i < 8; i++) {
   })
   var Pinn = new THREE.Group()
 
-  // var phi = (90 - lat) * (Math.PI / 180);
-  // var theta = (lon + 180) * (Math.PI / 180);
+  var phi = (90 - info.latitude) * (Math.PI / 180);
+  var theta = (info.longitude + 180) * (Math.PI / 180);
 
-  var sp = Spherical(Math.random() * 180);
+  var sp = Spherical(theta, phi);
   var p = new THREE.Mesh(pointMesh, pointMaterial);
   var toruss = new THREE.Mesh(tor, torMatt);
   p.position.setFromSpherical(sp)
@@ -185,7 +211,15 @@ for (var i = 0; i < 8; i++) {
   Pinn.add(p, toruss)
 
   Arr.push(Pinn)
+  console.log("called set Intevarl")
+  console.log(info)
+  // setTimeout(getInfo, 5000);
 }
+setInterval(() => {animate(), getInfo()}, 1000)
+// getInfo();
+
+
+
 //////////////////////////////////////////
 
 
@@ -238,13 +272,15 @@ moon.rotation.y = 3.1415 * 1.54;
 
 var ts = new THREE.Vector3(0, 0, 1)
 var radScale = 0
-let speed = 0.001
+let speed = 0.0001
+let freqSlider = .01; // [1 or 50]
+let sizeSlider = - 0.; // [-0.5: 0.5]
 
 function animate() {
-  requestAnimationFrame(animate);
+  // requestAnimationFrame(animate);
   MoonGroup.rotation.y += 0.005;
   MoonGroup.rotation.x += 0.0002;
-
+  console.log("arr", Arr)
   Arr.forEach(Pin => {
     let dist = Math.sqrt(Math.pow(Pin.children[1].position.x, 2) + Math.pow(Pin.children[1].position.y, 2) + Math.pow(Pin.children[1].position.z, 2))
 
@@ -252,21 +288,22 @@ function animate() {
 
     var direction = Pin.position.normalize()
 
-    if (dist < 0.9) Pin.children[1].position.set(
-      Pin.children[0].position.x,
-      Pin.children[0].position.y,
-      Pin.children[0].position
-        .z);
+    if (dist < 0.92 + sizeSlider) {
+      Pin.children[1].position.set(
+        Pin.children[0].position.x,
+        Pin.children[0].position.y,
+        Pin.children[0].position
+          .z);
+      speed = 0.00001
+      console.log(dist)
+    }
 
-    // if (dist < 0.8) speed = 0.00
+    speed += dist > 0.95 + sizeSlider ? 0.000001 * freqSlider : 0.000006 * freqSlider
 
-    radScale = (Math.sqrt(1 - dist * dist)) / 0.3 + 0.1
-    Pin.children[1].scale.set(radScale, radScale, 1);
+    radScale = (Math.sqrt(1 - dist * dist)) / 0.29
+    Pin.children[1].scale.set(radScale, radScale, 3);
 
   })
-
-
-
 
   renderer.render(scene, camera);
 }
