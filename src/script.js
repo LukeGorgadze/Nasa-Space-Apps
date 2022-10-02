@@ -1,8 +1,8 @@
 // import './style.css'
 import * as THREE from "../node_modules/three/build/three.module.js"
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { 
-    DoubleSide,
+import {
+  DoubleSide,
   PCFSoftShadowMap,
   MeshPhysicalMaterial,
   TextureLoader,
@@ -54,7 +54,7 @@ const controls = new OrbitControls(camera, renderer.domElement);
 controls.dampingFactor = 0.25;
 controls.enableDamping = true;
 
-renderer.setSize(window.innerWidth/1 / 1, window.innerHeight);
+renderer.setSize(window.innerWidth / 1 / 1, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 var moon = new THREE.SphereGeometry(2, 100, 100);
@@ -65,24 +65,24 @@ var displacementMap = textureLoader.load(displacementURL);
 var worldTexture = textureLoader.load(worldURL);
 
 var MoonMaterial = new MeshPhysicalMaterial({
-    map: texture,
-    displacementMap: displacementMap,
-    displacementScale: 0.05,
-    bumpMap: displacementMap,
-    roughness:1,
-    bumpScale: 0.05,
-    // envMap,
-    // envMapIntensity: 0.4,
-    reflectivity: 0.5,
-    sheen: 0.1,
-    sheenRoughness: 0.85,
-    sheenColor: new Color("#0000FF").convertSRGBToLinear(),
-    clearcoat: 0.3,
-    // clearcoatNormalScale:(.1,.1)
-    clearcoatRoughness:.5,
-    // wireframe:true
-    
-  })
+  map: texture,
+  displacementMap: displacementMap,
+  displacementScale: 0.05,
+  bumpMap: displacementMap,
+  roughness: 1,
+  bumpScale: 0.05,
+  // envMap,
+  // envMapIntensity: 0.4,
+  reflectivity: 0.5,
+  sheen: 0.1,
+  sheenRoughness: 0.85,
+  sheenColor: new Color("#0000FF").convertSRGBToLinear(),
+  clearcoat: 0.3,
+  // clearcoatNormalScale:(.1,.1)
+  clearcoatRoughness: .5,
+  // wireframe:true
+
+})
 
 var moon = new THREE.Mesh(moon, MoonMaterial);
 
@@ -91,7 +91,7 @@ const sunLight = new DirectionalLight(
   1.1,
 );
 sunLight.position.set(-100, 10, 50);
-sunLight.castShadow =  true;
+sunLight.castShadow = true;
 sunLight.shadow.mapSize.width = 512;
 sunLight.shadow.mapSize.height = 512;
 sunLight.shadow.camera.near = 0.5;
@@ -114,9 +114,10 @@ scene.add(hemiLight);
 
 const tor = new THREE.TorusGeometry(.5, .01, 16, 100);
 
-const torMat = new THREE.MeshPhongMaterial({ 
-    color: 0xffff00 ,
-    emissive: 0xffff00})
+const torMat = new THREE.MeshPhongMaterial({
+  color: 0xffff00,
+  emissive: 0xffff00
+})
 const torus = new THREE.Mesh(tor, torMat);
 // torus.scale.set(.5,.5,.5);
 
@@ -124,10 +125,13 @@ torus.name = "Torus"
 // scene.add( torus );
 
 var Pin = new THREE.Group()
+var angle = 0;
 
+var Spherical = (angle) => {
+  return new THREE.Spherical(1., Math.PI * angle / 180, angle)
+}
 
-var pointMesh = new THREE.SphereGeometry(.1, 20, 20)
-
+var pointMesh = new THREE.SphereGeometry(.01, 20, 20)
 var pointNorthMesh = new THREE.SphereGeometry(.2, 20, 20)
 var pointSouthMesh = new THREE.SphereGeometry(.2, 20, 20)
 var spherical = new THREE.Spherical(1., Math.PI * 50 / 180, 10)
@@ -136,14 +140,45 @@ var sphericalSouth = new THREE.Spherical(2.1, Math.PI * 180 / 180, 0)
 // var theta = Math.atan()
 // spherical.setFromCartesianCoords(geometry.position)
 var pointMaterial = new THREE.MeshPhongMaterial(
-    {
-        color: 0xe74c3c,
-        shininess: .5
-    }
+  {
+    color: 0xe74c3c,
+    shininess: .5
+  }
 
 );
 var point = new THREE.Mesh(pointMesh, pointMaterial)
 point.scale.set(1, 1, .2)
+
+let Arr = []
+let MoonGroup = new THREE.Group()
+
+for (var i = 0; i < 3; i++) {
+  let r = Math.random() * 255;
+  let g = Math.random() * 255;
+  let b = Math.random() * 255;
+  let color = new THREE.Color(`rgb(${0}, ${.5}, ${.4})`);
+  const torMatt = new THREE.MeshPhongMaterial({
+    color: color,
+    emissive: color
+  })
+  var Pinn = new THREE.Group()
+  var sp = Spherical(Math.random() * 180);
+  var p = new THREE.Mesh(pointMesh, pointMaterial);
+  var toruss = new THREE.Mesh(tor, torMatt);
+  p.position.setFromSpherical(sp)
+  toruss.position.setFromSpherical(sp)
+
+
+  Pinn.lookAt(0, 0, 0)
+  Pinn.position.setFromSpherical(sp)
+  // Pin.position.setFromSpherical(spherical)
+  toruss.lookAt(0, 0, 0)
+  p.lookAt(0, 0, 0)
+
+  Pinn.add(p, toruss)
+
+  Arr.push(Pinn)
+}
 //////////////////////////////////////////
 
 
@@ -167,9 +202,9 @@ pointSouth.position.setFromSpherical(sphericalSouth)
 // THREE.Spherical(2,0,0)
 
 
-let MoonGroup = new THREE.Group()
-MoonGroup.add(pointNorth)
-MoonGroup.add(pointSouth)
+
+// MoonGroup.add(pointNorth)
+// MoonGroup.add(pointSouth)
 
 //////////////////////////////////
 
@@ -179,11 +214,15 @@ scene.add(moon);
 
 //Add to Groups
 Pin.add(point, torus)
-MoonGroup.add(Pin)
+// MoonGroup.add(Pin)
 MoonGroup.add(moon)
 
 //Add Groups to scene
 scene.add(MoonGroup)
+
+Arr.forEach(Pin => {
+  MoonGroup.add(Pin)
+})
 
 camera.position.z = 35;
 
@@ -192,37 +231,44 @@ moon.rotation.y = 3.1415 * 1.54;
 
 var ts = new THREE.Vector3(0, 0, 1)
 var radScale = 0
-let speed= 0.01
+let speed = 0.001
+
 function animate() {
-    requestAnimationFrame(animate);
-    MoonGroup.rotation.y += 0.005;
-    MoonGroup.rotation.x += 0.0002;
-    let dist = Math.sqrt(Math.pow(Pin.children[1].position.x,2) + Math.pow(Pin.children[1].position.y,2) + Math.pow(Pin.children[1].position.z,2))
-    
+  requestAnimationFrame(animate);
+  MoonGroup.rotation.y += 0.005;
+  MoonGroup.rotation.x += 0.0002;
+
+  Arr.forEach(Pin => {
+    let dist = Math.sqrt(Math.pow(Pin.children[1].position.x, 2) + Math.pow(Pin.children[1].position.y, 2) + Math.pow(Pin.children[1].position.z, 2))
+
     Pin.children[1].translateZ(speed)
 
     var direction = Pin.position.normalize()
 
-    if (dist < 0.01) Pin.children[1].position.set(
+    if (dist < 0.9) Pin.children[1].position.set(
       Pin.children[0].position.x,
       Pin.children[0].position.y,
       Pin.children[0].position
-    .z);
-    
+        .z);
+
     // if (dist < 0.8) speed = 0.00
 
-    radScale = (Math.sqrt(1-dist*dist))/0.29
+    radScale = (Math.sqrt(1 - dist * dist)) / 0.3 + 0.1
     Pin.children[1].scale.set(radScale, radScale, 1);
 
+  })
 
-    renderer.render(scene, camera);
+
+
+
+  renderer.render(scene, camera);
 }
 animate();
 
 function onResize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
 window.addEventListener('resize', onResize, false);
