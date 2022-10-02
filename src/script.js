@@ -29,16 +29,11 @@ import {
 import dist from 'webpack-merge';
 import { quakeInfo } from "./bigQuakeDataWithTime.js";
 
-// var textureURL = "https://s3-us-west-2.amazonaws.com/s.cdpn.io/17271/lroc_color_poles_1k.jpg"; 
-// var displacementURL = "https://s3-us-west-2.amazonaws.com/s.cdpn.io/17271/ldem_3_8bit.jpg"; 
-// var worldURL = "https://s3-us-west-2.amazonaws.com/s.cdpn.io/17271/hipp8_s.jpg"
-
 var textureURL = "textures/Moon/Moon-Color.jpg"
 var displacementURL = "textures/Moon/Moon-Disp.jpg";
 var worldURL = "textures/Moon/Stars.jpg"
 
 var scene = new THREE.Scene();
-
 var camera = new THREE.PerspectiveCamera(10, window.innerWidth / window.innerHeight, 0.1, 2000);
 
 const renderer = new WebGLRenderer({ antialias: true, alpha: true });
@@ -51,7 +46,6 @@ renderer.shadowMap.type = PCFSoftShadowMap;
 document.body.appendChild(renderer.domElement);
 
 const controls = new OrbitControls(camera, renderer.domElement);
-// controls.target.set(0, 0, 0);
 controls.dampingFactor = 0.25;
 controls.enableDamping = true;
 
@@ -63,7 +57,6 @@ var moon = new THREE.SphereGeometry(2, 100, 100);
 var textureLoader = new THREE.TextureLoader();
 var texture = textureLoader.load(textureURL);
 var displacementMap = textureLoader.load(displacementURL);
-var worldTexture = textureLoader.load(worldURL);
 
 var MoonMaterial = new MeshPhysicalMaterial({
   map: texture,
@@ -72,16 +65,12 @@ var MoonMaterial = new MeshPhysicalMaterial({
   bumpMap: displacementMap,
   roughness: 1,
   bumpScale: 0.05,
-  // envMap,
-  // envMapIntensity: 0.4,
   reflectivity: 0.5,
   sheen: 0.1,
   sheenRoughness: 0.85,
   sheenColor: new Color("#0000FF").convertSRGBToLinear(),
   clearcoat: 0.3,
-  // clearcoatNormalScale:(.1,.1)
   clearcoatRoughness: .5,
-  // wireframe:true
 
 })
 
@@ -102,9 +91,6 @@ sunLight.shadow.camera.bottom = -10;
 sunLight.shadow.camera.top = 10;
 sunLight.shadow.camera.right = 10;
 scene.add(sunLight);
-// const light = new THREE.DirectionalLight(0xFFFFFF, 1.1);
-// light.position.set(-100, 10, 50);
-// scene.add(light);
 
 
 let hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.2);
@@ -120,10 +106,7 @@ const torMat = new THREE.MeshPhongMaterial({
   emissive: 0xffff00
 })
 const torus = new THREE.Mesh(tor, torMat);
-// torus.scale.set(.5,.5,.5);
-
 torus.name = "Torus"
-// scene.add( torus );
 
 var Pin = new THREE.Group()
 var angle = 0;
@@ -139,8 +122,7 @@ var pointSouthMesh = new THREE.SphereGeometry(.2, 20, 20)
 var spherical = new THREE.Spherical(1., Math.PI * 50 / 180, 10)
 var sphericalNorth = new THREE.Spherical(2.1, 0, 0)
 var sphericalSouth = new THREE.Spherical(2.1, Math.PI * 180 / 180, 0)
-// var theta = Math.atan()
-// spherical.setFromCartesianCoords(geometry.position)
+
 var pointMaterial = new THREE.MeshPhongMaterial(
   {
     color: 0xe74c3c,
@@ -154,39 +136,18 @@ point.scale.set(1, 1, .2)
 let Arr = []
 let MoonGroup = new THREE.Group()
 
-function makeRangeIterator(start = 0, end = Infinity, step = 1) {
-  let nextIndex = start;
-  let iterationCount = 0;
-
-  const rangeIterator = {
-    next() {
-      let result;
-      if (nextIndex < end) {
-        result = { value: quakeInfo[nextIndex], done: false };
-        nextIndex += step;
-        iterationCount++;
-        return result;
-      }
-      return { value: quakeInfo[nextIndex], done: true };
-    }
-  };
-  return rangeIterator;
-}
-
 
 Arr = []
-// const infoo = makeRangeIterator(0, quakeInfo.length, 1)
 let index = 0;
 let getPinn = (index) => {
   // Arr = []
   let info = quakeInfo[index]
-  index = (index + 1) % 10;
+  index = (index + 1) % quakeInfo.length;
   let r = Math.random() * 255;
   let g = Math.random() * 255;
   let b = Math.random() * 255;
   // let colorr = new THREE.Color(`rgb(255,255,255)`);
   let colorr = new THREE.Color("rgb(" + parseInt(r) + "," + parseInt(g) + "," + parseInt(b) + ")");
-  console.log(colorr)
   const torMatt = new THREE.MeshPhongMaterial({
     color: colorr,
     emissive: colorr
@@ -205,58 +166,35 @@ let getPinn = (index) => {
 
   Pinn.lookAt(0, 0, 0)
   Pinn.position.setFromSpherical(sp)
-  // Pin.position.setFromSpherical(spherical)
   toruss.lookAt(0, 0, 0)
   p.lookAt(0, 0, 0)
 
   Pinn.add(p, toruss)
   MoonGroup.add(Pinn)
-  console.log(info)
   return Pinn
 }
-// getPinn(0)
-
-
 
 //////////////////////////////////////////
-
-
 var pointSouth = new THREE.Mesh(pointNorthMesh, pointMaterial)
 var pointNorth = new THREE.Mesh(pointSouthMesh, pointMaterial)
 point.position.setFromSpherical(spherical)
 torus.position.setFromSpherical(spherical)
-// torus.rotation.setFromSpherical(spherical)
-
-// Pin.position.setFromSpherical(spherical)
 Pin.lookAt(0, 0, 0)
 Pin.position.setFromSpherical(spherical)
-// Pin.position.setFromSpherical(spherical)
+
 torus.lookAt(0, 0, 0)
 point.lookAt(0, 0, 0)
-// point.name = "PIN"
+
 pointNorth.position.setFromSpherical(sphericalNorth)
 pointSouth.position.setFromSpherical(sphericalSouth)
-// scene.add(point);
-
-// THREE.Spherical(2,0,0)
-
-
-
-// MoonGroup.add(pointNorth)
-// MoonGroup.add(pointSouth)
-
 //////////////////////////////////
 
-//Add to scene
-// scene.add(world);
 scene.add(moon);
 
-//Add to Groups
 Pin.add(point, torus)
-// MoonGroup.add(Pin)
 MoonGroup.add(moon)
 
-//Add Groups to scene
+
 scene.add(MoonGroup)
 
 Arr.forEach(Pin => {
@@ -271,23 +209,21 @@ moon.rotation.y = 3.1415 * 1.54;
 var ts = new THREE.Vector3(0, 0, 1)
 var radScale = 0
 let speed = 0.0001
-let freqSlider = .01; // [1 or 50]
-let sizeSlider = - 0.; // [-0.5: 0.5]
+let freqSlider = .01;
+let sizeSlider = - 0.;
 let timer = 0;
 let indexx = 0;
 let CurrentPin = getPinn(indexx)
 let lastUpdate = Date.now()
 function animate() {
   requestAnimationFrame(animate);
+  CurrentPin.children[1].scale.set(radScale, radScale, 3);
   var now = Date.now();
   var dt = now - lastUpdate;
   lastUpdate = now;
   timer += 0.01 * dt
   MoonGroup.rotation.y += 0.005;
   MoonGroup.rotation.x += 0.0002;
-  console.log("arr", Arr)
-  // Arr.forEach(Pin => {
-
   if (CurrentPin != null) {
     let dist = Math.sqrt(Math.pow(CurrentPin.children[1].position.x, 2) + Math.pow(CurrentPin.children[1].position.y, 2) + Math.pow(CurrentPin.children[1].position.z, 2))
 
@@ -302,19 +238,16 @@ function animate() {
         CurrentPin.children[0].position
           .z);
       speed = 0.00001
-      // console.log(dist)
     }
 
     speed += dist > 0.95 + sizeSlider ? 0.000001 * freqSlider : 0.000006 * freqSlider
 
     radScale = (Math.sqrt(1 - dist * dist)) / 0.29
-    CurrentPin.children[1].scale.set(radScale, radScale, 3);
+    // CurrentPin.children[1].scale.set(radScale, radScale, 3);
   }
 
-
-  // })
-
   if (timer >= 20) {
+    radScale = 1
     MoonGroup.remove(CurrentPin)
     indexx += 1
     CurrentPin = getPinn(indexx)
