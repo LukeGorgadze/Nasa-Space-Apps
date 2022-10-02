@@ -55,7 +55,7 @@ const controls = new OrbitControls(camera, renderer.domElement);
 controls.dampingFactor = 0.25;
 controls.enableDamping = true;
 
-renderer.setSize(window.innerWidth / 1.5 / 1, window.innerHeight);
+renderer.setSize(window.innerWidth / 1 / 1, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 var moon = new THREE.SphereGeometry(2, 100, 100);
@@ -175,11 +175,12 @@ function makeRangeIterator(start = 0, end = Infinity, step = 1) {
 
 
 Arr = []
-const infoo = makeRangeIterator(0, quakeInfo.length, 1)
+// const infoo = makeRangeIterator(0, quakeInfo.length, 1)
 let index = 0;
-let getInfo = () => {
+let getPinn = (index) => {
+  // Arr = []
   let info = quakeInfo[index]
-  index = (index+1)%10;
+  index = (index + 1) % 10;
   let r = Math.random() * 255;
   let g = Math.random() * 255;
   let b = Math.random() * 255;
@@ -209,14 +210,11 @@ let getInfo = () => {
   p.lookAt(0, 0, 0)
 
   Pinn.add(p, toruss)
-
-  Arr.push(Pinn)
-  console.log("called set Intevarl")
+  MoonGroup.add(Pinn)
   console.log(info)
-  // setTimeout(getInfo, 5000);
+  return Pinn
 }
-setInterval(getInfo, 1000)
-// getInfo();
+// getPinn(0)
 
 
 
@@ -275,36 +273,53 @@ var radScale = 0
 let speed = 0.0001
 let freqSlider = .01; // [1 or 50]
 let sizeSlider = - 0.; // [-0.5: 0.5]
-
+let timer = 0;
+let indexx = 0;
+let CurrentPin = getPinn(indexx)
+let lastUpdate = Date.now()
 function animate() {
-  // requestAnimationFrame(animate);
+  requestAnimationFrame(animate);
+  var now = Date.now();
+  var dt = now - lastUpdate;
+  lastUpdate = now;
+  timer += 0.01 * dt
   MoonGroup.rotation.y += 0.005;
   MoonGroup.rotation.x += 0.0002;
   console.log("arr", Arr)
-  Arr.forEach(Pin => {
-    let dist = Math.sqrt(Math.pow(Pin.children[1].position.x, 2) + Math.pow(Pin.children[1].position.y, 2) + Math.pow(Pin.children[1].position.z, 2))
+  // Arr.forEach(Pin => {
 
-    Pin.children[1].translateZ(speed)
+  if (CurrentPin != null) {
+    let dist = Math.sqrt(Math.pow(CurrentPin.children[1].position.x, 2) + Math.pow(CurrentPin.children[1].position.y, 2) + Math.pow(CurrentPin.children[1].position.z, 2))
+
+    CurrentPin.children[1].translateZ(speed)
 
     var direction = Pin.position.normalize()
 
     if (dist < 0.92 + sizeSlider) {
-      Pin.children[1].position.set(
-        Pin.children[0].position.x,
-        Pin.children[0].position.y,
-        Pin.children[0].position
+      CurrentPin.children[1].position.set(
+        CurrentPin.children[0].position.x,
+        CurrentPin.children[0].position.y,
+        CurrentPin.children[0].position
           .z);
       speed = 0.00001
-      console.log(dist)
+      // console.log(dist)
     }
 
     speed += dist > 0.95 + sizeSlider ? 0.000001 * freqSlider : 0.000006 * freqSlider
 
     radScale = (Math.sqrt(1 - dist * dist)) / 0.29
-    Pin.children[1].scale.set(radScale, radScale, 3);
+    CurrentPin.children[1].scale.set(radScale, radScale, 3);
+  }
 
-  })
 
+  // })
+
+  if (timer >= 20) {
+    MoonGroup.remove(CurrentPin)
+    indexx += 1
+    CurrentPin = getPinn(indexx)
+    timer = 0
+  }
   renderer.render(scene, camera);
 }
 animate();
