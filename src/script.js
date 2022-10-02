@@ -112,17 +112,8 @@ hemiLight.groundColor.setHSL(0.095, 1, 0.75);
 hemiLight.position.set(0, 0, 0);
 scene.add(hemiLight);
 
-
-var worldGeometry = new THREE.SphereGeometry(1000, 60, 60);
-var worldMaterial = new THREE.MeshBasicMaterial(
-    {
-        // color: 0x303952,
-        // map: worldTexture,
-        side: THREE.BackSide
-    }
-);
-
 const tor = new THREE.TorusGeometry(.5, .01, 16, 100);
+
 const torMat = new THREE.MeshPhongMaterial({ 
     color: 0xffff00 ,
     emissive: 0xffff00})
@@ -135,12 +126,11 @@ torus.name = "Torus"
 var Pin = new THREE.Group()
 
 
-var world = new THREE.Mesh(worldGeometry, worldMaterial);
 var pointMesh = new THREE.SphereGeometry(.1, 20, 20)
 
 var pointNorthMesh = new THREE.SphereGeometry(.2, 20, 20)
 var pointSouthMesh = new THREE.SphereGeometry(.2, 20, 20)
-var spherical = new THREE.Spherical(1., Math.PI * 120 / 180, 0)
+var spherical = new THREE.Spherical(1., Math.PI * 150 / 180, 10)
 var sphericalNorth = new THREE.Spherical(2.1, 0, 0)
 var sphericalSouth = new THREE.Spherical(2.1, Math.PI * 180 / 180, 0)
 // var theta = Math.atan()
@@ -203,22 +193,42 @@ moon.rotation.y = 3.1415 * 1.54;
 var ts = new THREE.Vector3(0, 0, 1)
 var radius = 2.1
 // var sphericalTor = 
-var depth = 2;
+var depth = .1;
+var y = 1.05
 
 function animate() {
     requestAnimationFrame(animate);
     // MoonGroup.rotation.y += 0.005;
     // MoonGroup.rotation.x += 0.0002;
-    world.rotation.y += 0.0001
-    world.rotation.x += 0.0005
 
-    var direction = Pin.position.normalize()
+    let dist = Math.sqrt(Math.pow(Pin.children[1].position.x,2) + Math.pow(Pin.children[1].position.y,2) + Math.pow(Pin.children[1].position.z,2))
+    // let r = Math.sqrt(y*y - dist*dist )
+  
+    Pin.children[1].translateZ(.005)
+    ts.x = Math.abs(dist - 1) * 4
+    // var direction = Pin.position.normalize()
+    // let scalar = 1.;
+    // let xDec = direction.x;
+    // let yDec = direction.y;
+    // let zDec = direction.z;
+    
+    // let Pos = Pin.position
+    // if(dist >= 0.1)
+    // {
+    //     Pin.position.set(Pos.x - scalar * xDec, Pos.y - scalar * yDec,Pos.z - scalar * zDec)
+    // }
+    // else
+    // {
+    //     Pin.position.set(0,0,0)
+    // }
 
-    depth -= .01
-    Pin.translateOnAxis(direction, depth)
-    if (depth <= -1) {
-        depth = -1
-    }
+    // depth -= .002
+    // Pin.translateOnAxis(direction, depth)
+    // if (depth <= -1) {
+    //     depth = -5
+    // }
+
+    // Pin.lookAt(0,0,0)
 
     // Pin.children[1].scale.x += 0.00001;
     // Pin.children[1].scale.y += 0.00001;
@@ -226,18 +236,11 @@ function animate() {
     // console.log(Pin.children)
 
 
-    ts.x += 0.02;
-    ts.y += 0.02;
+    // ts.x += 0.009;
+    // ts.y += 0.009;
     // ts.z += 0.2;
-    // Pin.scale.set(ts.x, ts.y, ts.z)
+    Pin.children[1].scale.set(ts.x, ts.x, ts.z)
 
-    // console.log(Pin?.children)
-
-
-    if (ts.x > 2) {
-        ts.x = 0.1;
-        ts.y = 0.1;
-    }
 
     renderer.render(scene, camera);
 }
