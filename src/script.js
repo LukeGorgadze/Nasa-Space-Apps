@@ -215,7 +215,7 @@ let getInfo = () => {
   console.log(info)
   // setTimeout(getInfo, 5000);
 }
-setInterval(() => {animate(), getInfo()}, 1000)
+setInterval(getInfo, 1000)
 // getInfo();
 
 
