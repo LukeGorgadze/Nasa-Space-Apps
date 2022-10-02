@@ -27,6 +27,7 @@ import {
   Group
 } from 'three';
 import dist from 'webpack-merge';
+import { quakeInfo } from "./bigQuakeDataWithTime.js";
 
 // var textureURL = "https://s3-us-west-2.amazonaws.com/s.cdpn.io/17271/lroc_color_poles_1k.jpg"; 
 // var displacementURL = "https://s3-us-west-2.amazonaws.com/s.cdpn.io/17271/ldem_3_8bit.jpg"; 
@@ -152,16 +153,22 @@ point.scale.set(1, 1, .2)
 let Arr = []
 let MoonGroup = new THREE.Group()
 
-for (var i = 0; i < 3; i++) {
+for (var i = 0; i < 8; i++) {
   let r = Math.random() * 255;
   let g = Math.random() * 255;
   let b = Math.random() * 255;
-  let color = new THREE.Color(`rgb(${0}, ${.5}, ${.4})`);
+  // let colorr = new THREE.Color(`rgb(${}, ${.5}, ${.4})`);
+  let colorr = new THREE.Color("rgb(" + parseInt(r) + "," + parseInt(g) + "," + parseInt(b) + ")");
+  console.log(colorr)
   const torMatt = new THREE.MeshPhongMaterial({
-    color: color,
-    emissive: color
+    color: colorr,
+    emissive: colorr
   })
   var Pinn = new THREE.Group()
+
+  // var phi = (90 - lat) * (Math.PI / 180);
+  // var theta = (lon + 180) * (Math.PI / 180);
+
   var sp = Spherical(Math.random() * 180);
   var p = new THREE.Mesh(pointMesh, pointMaterial);
   var toruss = new THREE.Mesh(tor, torMatt);
