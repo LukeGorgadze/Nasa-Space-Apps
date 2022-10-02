@@ -130,7 +130,7 @@ var pointMesh = new THREE.SphereGeometry(.1, 20, 20)
 
 var pointNorthMesh = new THREE.SphereGeometry(.2, 20, 20)
 var pointSouthMesh = new THREE.SphereGeometry(.2, 20, 20)
-var spherical = new THREE.Spherical(1., Math.PI * 150 / 180, 10)
+var spherical = new THREE.Spherical(1., Math.PI * 50 / 180, 10)
 var sphericalNorth = new THREE.Spherical(2.1, 0, 0)
 var sphericalSouth = new THREE.Spherical(2.1, Math.PI * 180 / 180, 0)
 // var theta = Math.atan()
@@ -191,61 +191,33 @@ moon.rotation.x = 3.1415 * 0.02;
 moon.rotation.y = 3.1415 * 1.54;
 
 var ts = new THREE.Vector3(0, 0, 1)
-var radius = 2.1
-// var sphericalTor = 
-var depth = .1;
-var y = 1.05
-
+var radScale = 0
+let speed= 0.01
 function animate() {
     requestAnimationFrame(animate);
-    // MoonGroup.rotation.y += 0.005;
-    // MoonGroup.rotation.x += 0.0002;
-
+    MoonGroup.rotation.y += 0.005;
+    MoonGroup.rotation.x += 0.0002;
     let dist = Math.sqrt(Math.pow(Pin.children[1].position.x,2) + Math.pow(Pin.children[1].position.y,2) + Math.pow(Pin.children[1].position.z,2))
-    // let r = Math.sqrt(y*y - dist*dist )
-  
-    Pin.children[1].translateZ(.005)
-    ts.x = Math.abs(dist - 1) * 4
-    // var direction = Pin.position.normalize()
-    // let scalar = 1.;
-    // let xDec = direction.x;
-    // let yDec = direction.y;
-    // let zDec = direction.z;
     
-    // let Pos = Pin.position
-    // if(dist >= 0.1)
-    // {
-    //     Pin.position.set(Pos.x - scalar * xDec, Pos.y - scalar * yDec,Pos.z - scalar * zDec)
-    // }
-    // else
-    // {
-    //     Pin.position.set(0,0,0)
-    // }
+    Pin.children[1].translateZ(speed)
 
-    // depth -= .002
-    // Pin.translateOnAxis(direction, depth)
-    // if (depth <= -1) {
-    //     depth = -5
-    // }
+    var direction = Pin.position.normalize()
 
-    // Pin.lookAt(0,0,0)
+    if (dist < 0.01) Pin.children[1].position.set(
+      Pin.children[0].position.x,
+      Pin.children[0].position.y,
+      Pin.children[0].position
+    .z);
+    
+    // if (dist < 0.8) speed = 0.00
 
-    // Pin.children[1].scale.x += 0.00001;
-    // Pin.children[1].scale.y += 0.00001;
-    // Pin.children[1].scale.z += 0.00001;
-    // console.log(Pin.children)
-
-
-    // ts.x += 0.009;
-    // ts.y += 0.009;
-    // ts.z += 0.2;
-    Pin.children[1].scale.set(ts.x, ts.x, ts.z)
+    radScale = (Math.sqrt(1-dist*dist))/0.29
+    Pin.children[1].scale.set(radScale, radScale, 1);
 
 
     renderer.render(scene, camera);
 }
 animate();
-
 
 function onResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
