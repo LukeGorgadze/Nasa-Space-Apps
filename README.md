@@ -1,16 +1,2 @@
-# Three.js Journey
-
-## Setup
-Download [Node.js](https://nodejs.org/en/download/).
-Run this followed commands:
-
-``` bash
-# Install dependencies (only the first time)
-npm install
-
-# Run the local server at localhost:8080
-npm run dev
-
-# Build for production in the dist/ directory
-npm run build
-```
+<a href="https://moonquake.netlify.app/">Moon quake web application<a>
+![Moonquake](https://user-images.githubusercontent.com/97985323/194724192-ca319d0c-8820-42a0-85ed-48caae1689e8.png)
